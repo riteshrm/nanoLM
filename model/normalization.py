@@ -1,2 +1,0 @@
-# class LayerNorm(...)
-# class RMSNorm(...)

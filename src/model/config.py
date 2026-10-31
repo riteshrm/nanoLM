@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 
 @dataclass
 class ModelConfig:
@@ -13,6 +13,7 @@ class ModelConfig:
 
     attention_type: str = "mha"
     mlp_type: str = "swiglu"
+    pe_type: str= 'sincos'
 
     use_rope: bool = True
     norm_type: str = "rmsnorm"
@@ -20,3 +21,8 @@ class ModelConfig:
     use_moe: bool = False
     num_experts: int = 8
     top_k_experts: int = 2
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        names = {f.name for f in fields(cls)}
+        return cls(**{k: v for k, v in d.items() if k in names})

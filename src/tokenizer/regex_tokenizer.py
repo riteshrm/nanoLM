@@ -11,11 +11,27 @@ class RegexTokenizer(BaseTokenizer):
         self.compiled_pattern = re.compile(self.pattern)
 
     def encode(self, text):
-        text_chunks = re.findall(self.compiled_pattern, text)
+        special = self.special_tokens
+        special_pattern = "(" + "|".join(re.escape(k) for k in special) + ")"
+        special_chunks = re.split(special_pattern, text)
+        # now all the special characters are separated from the rest of the text
+        # all chunks of text are encoded separately, then results are joined
         ids = []
-        for text_chunk in text_chunks:
-            ids.extend(super().encode(text_chunk))
+        for part in special_chunks:
+            if part in special:
+                # this is a special token, encode it separately as a special case
+                ids.append(special[part])
+            else:
+                # this is an ordinary sequence, encode it normally
+                ids.extend(self.encode_ordinary(part))
         return ids
+    
+    def encode_ordinary(self, text):
+            text_chunks = re.findall(self.compiled_pattern, text)
+            ids = []
+            for text_chunk in text_chunks:
+                ids.extend(super().encode(text_chunk))
+            return ids
 
     def train(self, vocab_size, text):
         assert vocab_size >= 256, "vocab_size must be greater than 256"

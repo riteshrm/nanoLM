@@ -1,8 +1,9 @@
 import argparse
-from .basic_tokenizer import BaseTokenizer
-from .regex_tokenizer import RegexTokenizer
+from src.tokenizer.basic_tokenizer import BaseTokenizer
+from src.tokenizer.regex_tokenizer import RegexTokenizer
 from datasets import load_from_disk
-
+SPECIAL_TOKENS={'<|endoftext|>': 513}
+TEST_TEXT = "The trainer’s own saves do not follow its resume convention <|endoftext|>"
 def run(args):
 
     ds = load_from_disk(args.data_path)
@@ -17,7 +18,14 @@ def run(args):
         raise ValueError("Invalid tokenizer type. Choose 'regex' or 'basic'.")
 
     tokenizer.train(args.vocab_size, text)
+    tokenizer.register_special_tokens(SPECIAL_TOKENS)
     tokenizer.save(f"{args.save_path}/{args.tokenizer_type}")
+    print("Testing tokenizer")
+    tokenizer.load(f"{args.save_path}/{args.tokenizer_type}")
+    ids = tokenizer.encode(TEST_TEXT)
+    print("Tokenized ids: ", ids)
+    decoded_text = tokenizer.decode(ids)
+    print("Ground Truth Text == Decoded Text: ", TEST_TEXT==decoded_text)
 
 def main():
     parser = argparse.ArgumentParser(description="Train a tokenizer.")

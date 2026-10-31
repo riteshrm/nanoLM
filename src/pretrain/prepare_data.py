@@ -1,14 +1,14 @@
 import argparse
-from tokenizer.basic_tokenizer import BaseTokenizer
-from tokenizer.regex_tokenizer import RegexTokenizer
+from src.tokenizer.basic_tokenizer import BaseTokenizer
+from src.tokenizer.regex_tokenizer import RegexTokenizer
 from datasets import load_from_disk
 import numpy as np
 
 def run(args):
 
     ds = load_from_disk(args.data_path)
-    train_text = "\n".join(ds["train"][:50000]["text"])
-    val_text = "\n".join(ds["validation"][:1000]["text"])
+    train_text = " <|endoftext|> ".join(ds["train"][:50000]["text"]) + " <|endoftext|> "
+    val_text = " <|endoftext|> ".join(ds["validation"][:500]["text"]) + " <|endoftext|> "
     if args.tokenizer_type == "regex":
         print("Using RegexTokenizer...")
         tokenizer = RegexTokenizer()
@@ -48,4 +48,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# python -m pretrain.prepare_data --tokenizer_type='regex' --data_path="data/TinyStories" --save_path="data" --tokenizer_path="tokenizer_model"
+# python -m src.pretrain.prepare_data --tokenizer_type='regex' --data_path="data/TinyStories" --save_path="data" --tokenizer_path="tokenizer_model"

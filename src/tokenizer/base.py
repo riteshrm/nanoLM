@@ -46,6 +46,12 @@ class Tokenizer:
     def encode(self, text):
         raise NotImplementedError("The encode method should be implemented in a subclass.")
 
+    def register_special_tokens(self, special_tokens):
+        # special_tokens is a dictionary of str -> int
+        # example: {"<|endoftext|>": 100257}
+        self.special_tokens = special_tokens
+        self.inverse_special_tokens = {v: k for k, v in special_tokens.items()}
+    
     def decode(self, ids):
         raise NotImplementedError("The decode method should be implemented in a subclass.")
 
@@ -94,6 +100,7 @@ class Tokenizer:
                 merges[pair] = idx
         self.merges = merges
         self.special_tokens = special_tokens
+        self.inverse_special_tokens = {v: k for k, v in self.special_tokens.items()}
         self.vocab = self.build_vocab()
 
     def build_vocab(self):

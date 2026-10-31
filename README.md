@@ -11,7 +11,7 @@ For a detailed explanation of BPE tokenization and the ideas behind this impleme
 ```
 nanoLM/
 │
-├── tokenizer/
+├── src/tokenizer/
 │   ├── __init__.py
 │   ├── base.py
 │   ├── basic_tokenizer.py
@@ -19,9 +19,10 @@ nanoLM/
 │   ├── regex_tokenizer.py
 │   └── train.py
 │
-├── utils/
+├── src/utils/
 │   ├── __init__.py
-│   └── data_downloader.py
+│   ├── data_downloader.py
+│   └── utils.py
 │
 └── requirements.txt
 ```
@@ -50,13 +51,13 @@ pip install -r requirements.txt
 This will download the required dataset.
 
 ```bash
-python -m utils.data_downloader
+python -m src.utils.data_downloader
 ```
 
 ## Train
 
 ```bash
-python -m tokenizer.train --tokenizer_type="regex" --vocab_size=512 --data_path="data/TinyStories" --save_path="tokenizer_model"
+python -m src.tokenizer.train --tokenizer_type="regex" --vocab_size=512 --data_path="data/TinyStories" --save_path="tokenizer_model"
 ```
 
 The tokenizer type can be either `basic` or `regex`. The vocabulary size defaults to `512`. `data_path` should point to the downloaded TinyStories dataset.
@@ -66,5 +67,5 @@ After training, `merges.model` and `vocab.vocab` are saved under `<save_path>/<t
 ## Inference
 
 ```bash
-python -m tokenizer.inference --tokenizer_type="regex" --save_path="tokenizer_model/regex"
+python -m src.tokenizer.inference --tokenizer_type="regex" --save_path="tokenizer_model/regex"
 ```
