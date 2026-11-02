@@ -1,3 +1,4 @@
+import os
 import argparse
 from src.tokenizer.basic_tokenizer import BaseTokenizer
 from src.tokenizer.regex_tokenizer import RegexTokenizer
@@ -6,20 +7,31 @@ SPECIAL_TOKENS={'<|endoftext|>': 513}
 TEST_TEXT = "The trainer’s own saves do not follow its resume convention <|endoftext|>"
 def run(args):
 
-    ds = load_from_disk(args.data_path)
-    text = "\n".join(ds["train"][:20000]["text"])
+    tiny_ds = load_from_disk(os.path.join(args.data_path, 'TinyStories'))
+    wiki_ds = load_from_disk(os.path.join(args.data_path, 'wikitext-103-v1'))
+    fineweb_ds = load_from_disk(os.path.join(args.data_path, 'fineweb_edu'))
+
+    tiny_text = "\n".join(tiny_ds["train"][:2000]["text"])
+    wiki_text = "\n".join(wiki_ds["train"]["text"])
+    fineweb_text = "\n".join(fineweb_ds["train"]["text"])
+    print("Length of tiny_ds: ", len(tiny_ds["train"]))
+    print("Length of wiki_ds: ", len(wiki_ds["train"]["text"]))
+    print("Length of fineweb_ds: ", len(fineweb_ds["train"]["text"]))
+
+    text = "\n".join([tiny_text, wiki_text, fineweb_text])
     if args.tokenizer_type == "regex":
-        print("Training RegexTokenizer...")
+        print("Initializing RegexTokenizer...")
         tokenizer = RegexTokenizer()
     elif args.tokenizer_type == "basic":
-        print("Training BaseTokenizer...")
+        print("Initializing BaseTokenizer...")
         tokenizer = BaseTokenizer()
     else:
         raise ValueError("Invalid tokenizer type. Choose 'regex' or 'basic'.")
 
+    print("Training")
     tokenizer.train(args.vocab_size, text)
     tokenizer.register_special_tokens(SPECIAL_TOKENS)
-    tokenizer.save(f"{args.save_path}/{args.tokenizer_type}")
+    # tokenizer.save(f"{args.save_path}/{args.tokenizer_type}")
     print("Testing tokenizer")
     tokenizer.load(f"{args.save_path}/{args.tokenizer_type}")
     ids = tokenizer.encode(TEST_TEXT)

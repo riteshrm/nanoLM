@@ -57,10 +57,10 @@ python -m src.utils.data_downloader
 ## Train
 
 ```bash
-python -m src.tokenizer.train --tokenizer_type="regex" --vocab_size=512 --data_path="data/TinyStories" --save_path="tokenizer_model"
+python -m src.tokenizer.train --tokenizer_type="regex" --vocab_size=258 --data_path="data" --save_path="tokenizer_model"
 ```
 
-The tokenizer type can be either `basic` or `regex`. The vocabulary size defaults to `512`. `data_path` should point to the downloaded TinyStories dataset.
+The tokenizer type can be either `basic` or `regex`. The vocabulary size defaults to `512`. `data_path` should point to the downloaded wikitext-103-v1 dataset.
 
 After training, `merges.model` and `vocab.vocab` are saved under `<save_path>/<tokenizer_type>/`.
 

@@ -132,7 +132,9 @@ def run(args):
         for input, target in train_dataloader:
             input, target = input.to(device), target.to(device)
             logits = model(input)
-            loss = calculate_loss(target=target, logits=logits)/args.gradient_accumulation_steps
+            loss = calculate_loss(target=target, logits=logits)
+            train_loss = loss.item()
+            loss = loss/args.gradient_accumulation_steps
             loss.backward()
             if global_step%args.gradient_accumulation_steps==0:
                 optimizer.step()
@@ -140,7 +142,7 @@ def run(args):
                 optimizer.zero_grad(set_to_none=True)
 
             metrics = {
-                "train_loss": loss.item(),
+                "train_loss": train_loss,
             }
             
             if global_step%args.checkpoint_step==0:
@@ -164,7 +166,6 @@ def run(args):
                         logits = model(val_input)
                         val_loss = calculate_loss(target=val_target, logits=logits)
                         total_val_loss+=(val_loss.item() /len(val_dataloader))
-                        break
                     
                     generated_ids = model.generate(test_ids).squeeze(0).tolist()
                     generated_text = tokenizer.decode(generated_ids)
